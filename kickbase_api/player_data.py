@@ -30,7 +30,7 @@ def get_player_market_value(token, competition_id, player_id, last_mv_values):
     market_values = [
         {
             "mv": value,
-            "md": (epoch + timedelta(days=days)).date().isoformat()
+            "date": (epoch + timedelta(days=days)).date().isoformat()
         }
         for days, value in market_values
     ]
@@ -139,6 +139,7 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
 
         result.append({
             "md": datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date().isoformat(),
+            "date": datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date().isoformat(),
             "p": points,
             "mp": minutes_played,
             "ppm": ppm,
