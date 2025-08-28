@@ -82,7 +82,7 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
     data = resp.json()
-
+    
     # Gather all performance entries
     all_ph = [
         m
