@@ -82,21 +82,31 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
     data = resp.json()
-    
+
     # Gather all performance entries
     all_ph = [
         m
         for item in data["it"]
         for m in item["ph"]
     ]
-
-    # Only include performances up to the current date
+    
+    # Only include performances up to the current date or the next md
     current_date = datetime.now().date()
+
+    # Find next matchday date after current date
+    future_dates = [
+        datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date()
+        for m in all_ph
+        if datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date() > current_date
+    ]
+    next_md = min(future_dates) if future_dates else current_date
+
+    # Keep performances up to next_md
     all_ph = [
         m for m in all_ph
-        if datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date() <= current_date
+        if datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date() <= next_md
     ]
-
+    
     # Last n performance values
     performance_values = all_ph[-last_pfm_values:]
 
