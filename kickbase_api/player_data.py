@@ -1,5 +1,5 @@
+from kickbase_api.team_data import get_all_teams, get_matchdays
 from kickbase_api.constants import BASE_URL
-from kickbase_api.team_data import get_all_teams
 from datetime import datetime, timedelta
 import requests
 
@@ -89,11 +89,12 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
         for item in data["it"]
         for m in item["ph"]
     ]
-    
+
+    # TODO: This makes problems rn, as one row of data will be added for each matchday
+    # Since they are not on the same days this makes problems if we are on the day of a matchday
     # Only include performances up to the current date or the next md
     current_date = datetime.now().date()
 
-    # Find next matchday date after current date
     future_dates = [
         datetime.fromisoformat(m["md"].replace("Z", "+00:00")).date()
         for m in all_ph
@@ -162,3 +163,19 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
         })
 
     return result
+
+
+
+def get_max_date(data: dict, day: int) -> str | None:
+    max_dt = None
+
+    for day_block in data.get("it", []):
+        if day_block.get("day") == day:
+            for match in day_block.get("it", []):
+                dt_str = match.get("dt")
+                if dt_str:
+                    dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                    if not max_dt or dt > max_dt:
+                        max_dt = dt
+
+    return max_dt.isoformat() if max_dt else None
