@@ -2,6 +2,7 @@ from pipeline.predictions import live_data_predictions, join_current_market
 from pipeline.preprocessing import preprocess_player_data, split_data
 from pipeline.modeling import train_model, evaluate_model
 from kickbase_api.user_management import login
+from pipeline.notifier import send_mail
 from pipeline.data_handler import (
     create_player_data_table,
     check_if_data_reload_needed,
@@ -12,10 +13,15 @@ from IPython.display import display
 from dotenv import load_dotenv
 import os
 
+# ----------------- USER CONFIGURATION -----------------
+# Most settings can and should be left as default
+
 competition_ids = [1]   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
 last_mv_values = 365    # in days, max 365
 last_pfm_values = 50    # in matchdays, max idk
 
+
+# features for training and prediction
 # TODO Add features like starting 11 probability, injuries, ...
 features = [
     "p", "mv", "days_to_next", 
@@ -24,7 +30,13 @@ features = [
     "mv_trend_7d", "market_divergence"
 ]
 
-target = "mv_target_clipped" # or "mv_target"
+# what column to learn and predict on
+target = "mv_target_clipped"
+
+# Email to send recommendations to
+email = os.getenv("EMAIL_USER")
+
+# ------------------------------------------------
 
 # Load environment variables and login to kickbase
 load_dotenv() 
@@ -54,4 +66,6 @@ live_predictions_df = live_data_predictions(today_df, model, features)
 
 # Join with current available players on the market
 bid_recommendations_df = join_current_market(token, live_predictions_df)
-display(bid_recommendations_df)
+
+# Send email with recommendations
+send_mail(bid_recommendations_df, email)

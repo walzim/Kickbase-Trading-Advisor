@@ -65,6 +65,7 @@ def check_if_data_reload_needed():
             reload_data = False
         # All other cases: last entry before today or last entry today but after 22:00
         else:
+            print(f"Data reload needed. This takes a few minutes...")
             reload_data = True
 
     return reload_data
