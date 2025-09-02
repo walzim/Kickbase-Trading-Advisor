@@ -57,7 +57,8 @@ def check_if_data_reload_needed():
         if last_null_entry is not None:
             last_null_entry = datetime.fromisoformat(last_null_entry[0]).date()
 
-        # If this entry is after today then we are up to date
+        # If this entry is after today then we are up to date #TODO change this so it looks if there is an entry for tomorrow
+        # TODO If we dont do this, we will never update the data bc we always store the next matchday as rows,so there will always be a future date with null mv 
         if last_null_entry is not None and last_null_entry > today:
             reload_data = False
         # If this entry is today and it is before 22:00 then we are up to date

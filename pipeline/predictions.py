@@ -66,7 +66,13 @@ def join_current_market(token, today_df_results):
     # Sort by predicted_mv_target descending
     bid_df = bid_df.sort_values("predicted_mv_target", ascending=False)
 
+    # Rename prob to s_11_prob for better understanding
+    bid_df = bid_df.rename(columns={"prob": "s_11_prob"})
+
+    # Rename mv_change_1d to mv_change_yesterday for better understanding
+    bid_df = bid_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
+
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "position", "team_name", "mv", "mv_change_1d", "predicted_mv_target", "prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return bid_df

@@ -13,6 +13,8 @@ from IPython.display import display
 from dotenv import load_dotenv
 import os
 
+# TODO Analyze the team of the user and the potential market values changes there
+
 # ----------------- USER CONFIGURATION -----------------
 # Most settings can and should be left as default
 
@@ -66,6 +68,7 @@ live_predictions_df = live_data_predictions(today_df, model, features)
 
 # Join with current available players on the market
 bid_recommendations_df = join_current_market(token, live_predictions_df)
+display(bid_recommendations_df)
 
 # Send email with recommendations
 send_mail(bid_recommendations_df, email)
