@@ -1,0 +1,146 @@
+from kickbase_api.player_data import (
+    get_all_players,
+    get_player_info,
+    get_player_market_value,
+    get_player_performance,
+)
+from datetime import datetime
+import concurrent.futures
+import pandas as pd
+import sqlite3
+
+def create_player_data_table():
+    """Create the player_data_1d table in the SQLite database if it doesn't exist"""
+
+    conn = sqlite3.connect("player_data_total.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS player_data_1d (
+        player_id INTEGER,
+        team_id INTEGER,
+        team_name TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        position TEXT,
+        md DATE,
+        date DATE,
+        p REAL,
+        mp INTEGER,
+        ppm REAL,
+        t1 INTEGER,
+        t2 INTEGER,
+        t1g INTEGER,
+        t2g INTEGER,
+        won INTEGER,
+        k TEXT,
+        mv REAL
+    );
+    """)
+
+    conn.commit()
+
+def check_if_data_reload_needed():
+    """Check if data reload is needed based on the last entry with null market value"""
+
+    now = datetime.now()
+    today = now.date()
+    current_hour = now.hour
+
+    # Get nearest entry to today where mv is null
+    with sqlite3.connect("player_data_total.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT date FROM player_data_1d WHERE mv IS NULL ORDER BY date ASC LIMIT 1;")
+        last_null_entry = cursor.fetchone()
+
+        # convert last_null_entry (timestamp) to date
+        if last_null_entry is not None:
+            last_null_entry = datetime.fromisoformat(last_null_entry[0]).date()
+
+        # If this entry is after today then we are up to date
+        if last_null_entry is not None and last_null_entry > today:
+            reload_data = False
+        # If this entry is today and it is before 22:00 then we are up to date
+        elif last_null_entry is not None and last_null_entry == today and current_hour < 22:
+            reload_data = False
+        # All other cases: last entry before today or last entry today but after 22:00
+        else:
+            reload_data = True
+
+    return reload_data
+
+def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_values, reload_data):
+    """Fetch player data and save to SQLite database if reload_data is needed"""
+
+    if reload_data:
+        all_competitions_dfs = []
+
+        for competition_id in competition_ids:
+            players = get_all_players(token, competition_id)
+
+            def process_player(player_id):
+                player_info = get_player_info(token, competition_id, player_id)
+                player_team_id = player_info["team_id"]
+                player_df = pd.DataFrame([player_info])
+
+                # Market Value
+                mv_df = pd.DataFrame(get_player_market_value(token, competition_id, player_id, last_mv_values))
+                if not mv_df.empty:
+                    mv_df["date"] = pd.to_datetime(mv_df["date"]).sort_values()
+
+                # Performance
+                p_df = pd.DataFrame(get_player_performance(token, competition_id, player_id, last_pfm_values, player_team_id))
+                if not p_df.empty:
+                    p_df["date"] = pd.to_datetime(p_df["date"]).sort_values()
+                else:
+                    p_df = pd.DataFrame({"date": pd.to_datetime([])})
+
+                # Merge DataFrames
+                merged_df = (
+                    pd.merge_asof(mv_df, p_df, on="date", direction="backward")
+                    if not mv_df.empty else pd.DataFrame()
+                )
+
+                # Get p_df values where p_df.date > max(mv_df.date) and append to merged_df
+                if not p_df.empty and not mv_df.empty:
+                    max_mv_date = mv_df["date"].max()
+                    additional_p_df = p_df[p_df["date"] > max_mv_date]
+                    merged_df = pd.concat([merged_df, additional_p_df], ignore_index=True) 
+
+                if not merged_df.empty:
+                    merged_df = player_df.merge(merged_df, how="cross")
+                    merged_df["competition_id"] = competition_id
+
+                return merged_df
+
+            # Use ThreadPoolExecutor to parallelize player fetching
+            with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
+                comp_dfs = list(executor.map(process_player, players))
+            
+            comp_final_df = pd.concat(
+                [df.dropna(how="all", axis=1) for df in comp_dfs if df is not None and not df.empty],
+                ignore_index=True
+            )
+
+            all_competitions_dfs.append(comp_final_df)
+
+        # Combine all competitions
+        final_df = pd.concat(all_competitions_dfs, ignore_index=True)
+
+        # Convert k column to string
+        final_df["k"] = final_df["k"].apply(
+            lambda x: ",".join(map(str, x)) if isinstance(x, list) else (None if x is None else str(x))
+        )
+
+        # Save to SQLite
+        with sqlite3.connect("player_data_total.db") as conn:
+            final_df.to_sql("player_data_1d", conn, if_exists="replace", index=False)
+
+def load_player_data_from_db():
+    """Load player data from SQLite database into a dataframe"""
+    
+    conn = sqlite3.connect("player_data_total.db")
+    df = pd.read_sql("SELECT * FROM player_data_1d", conn)
+    conn.close()
+
+    return df
