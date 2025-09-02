@@ -34,12 +34,12 @@ features = [
 target = "mv_target_clipped"
 
 # Email to send recommendations to
+load_dotenv() 
 email = os.getenv("EMAIL_USER")
 
 # ------------------------------------------------
 
 # Load environment variables and login to kickbase
-load_dotenv() 
 USERNAME = os.getenv("KICK_USER")
 PASSWORD = os.getenv("KICK_PASS")
 token = login(USERNAME, PASSWORD)
