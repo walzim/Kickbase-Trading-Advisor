@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 import os
 
 # TODO Analyze the team of the user and the potential market values changes there
+# TODO Change from 22:00 to 22:30, since mv updates take some time
 
 # ----------------- USER CONFIGURATION -----------------
 # Most settings can and should be left as default
@@ -45,6 +46,7 @@ email = os.getenv("EMAIL_USER")
 USERNAME = os.getenv("KICK_USER")
 PASSWORD = os.getenv("KICK_PASS")
 token = login(USERNAME, PASSWORD)
+print("Logged in to Kickbase.")
 
 # Data handling
 create_player_data_table()
@@ -71,4 +73,4 @@ bid_recommendations_df = join_current_market(token, live_predictions_df)
 display(bid_recommendations_df)
 
 # Send email with recommendations
-send_mail(bid_recommendations_df, email)
+#send_mail(bid_recommendations_df, email)
