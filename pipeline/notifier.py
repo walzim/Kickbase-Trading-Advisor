@@ -44,7 +44,7 @@ def send_mail(market_df, squad_df, email):
         
         <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
         
-        <p style="font-size: 14px; color: #333;">Greetings!<br><br>
+        <p style="font-size: 14px; color: #333;">Greetings!<br>
 
         <h3 style="color: #2c3e50; margin-top: 30px;">Current Market Predictions</h3>
         The following table shows all available players with a substantial positive predicted market value for the next day:</p>
