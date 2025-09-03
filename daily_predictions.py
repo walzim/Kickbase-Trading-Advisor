@@ -79,9 +79,11 @@ live_predictions_df = live_data_predictions(today_df, model, features)
 
 # Join with current available players on the market
 market_recommendations_df = join_current_market(token, league_id, live_predictions_df)
+display(market_recommendations_df)
 
 # Join with current players on the team
 squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
+display(squad_recommendations_df)
 
 # Send email with recommendations
 send_mail(market_recommendations_df, squad_recommendations_df, email)
