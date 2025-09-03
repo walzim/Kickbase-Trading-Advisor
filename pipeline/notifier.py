@@ -30,7 +30,7 @@ def send_mail(data_df, email):
         <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
         
         <p style="font-size: 14px; color: #333;">Greetings!<br><br>
-        The available players and their <b>predicted market values</b> for the following day are listed below:</p>
+        The available players and their <b>predicted market values</b> for the next day are listed below. Only players with a substantial positive predicted market value are shown.</p>
 
         {data_df.to_html(index=False, border=0, classes='dataframe', escape=False).replace(
             '<table',
