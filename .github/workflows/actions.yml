@@ -25,6 +25,7 @@ jobs:
       - name: Run daily_predictions.py
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           KICK_USER: ${{ secrets.KICK_USER }}
           KICK_PASS: ${{ secrets.KICK_PASS }}
         run: |
