@@ -82,10 +82,12 @@ def preprocess_player_data(df):
 def split_data(df, features, target):
     """Split the data into training and testing sets based on date to avoid data leakage"""
 
-    # TODO: More dynamic approach for split
+    split_idx = int(len(df) * 0.8)
+    split_date = df["date"].iloc[split_idx]
+
     # Split by time, to avoid data leakage
-    train = df[df["date"] < "2025-01-01"]
-    test = df[(df["date"] >= "2025-01-01")]
+    train = df[df["date"] < split_date]
+    test = df[(df["date"] >= split_date)]
 
     X_train = train[features]
     y_train = train[target]

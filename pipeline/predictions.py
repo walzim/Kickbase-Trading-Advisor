@@ -1,3 +1,4 @@
+from kickbase_api.user_management import get_players_in_squad
 from datetime import datetime, timedelta
 from kickbase_api.league_data import (
     get_leagues_infos,
@@ -34,16 +35,35 @@ def live_data_predictions(today_df, model, features):
     return today_df_results
 
 
-def join_current_teamet(token, today_df_results):
-    pass
+def join_current_squad(token, league_id, today_df_results):
+    squad_players = get_players_in_squad(token, league_id)
+
+    squad_df = pd.DataFrame(squad_players["it"])
+
+    # Join squad_df ("i") with today_df ("player_id")
+    squad_df = (
+        pd.merge(today_df_results, squad_df, left_on="player_id", right_on="i")
+        .drop(columns=["i"])
+    )
+
+    # Rename prob to s_11_prob for better understanding
+    squad_df = squad_df.rename(columns={"prob": "s_11_prob"})
+
+    # Rename mv_change_1d to mv_change_yesterday for better understanding
+    squad_df = squad_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
+
+    # Rename "mv_x" to "mv" for better understanding
+    squad_df = squad_df.rename(columns={"mv_x": "mv"})
+
+    # Keep only relevant columns
+    squad_df = squad_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob"]]
+
+    return squad_df  # Debugging line to inspect the response structure
 
 
 # TODO Add fail-safe check before player expires if the prob (starting 11) is still high, so no injuries or anything. if it dropped. dont bid / reccommend
-def join_current_market(token, today_df_results):
+def join_current_market(token, league_id, today_df_results):
     """Join the live predictions with the current market data to get bid recommendations"""
-
-    league_infos = get_leagues_infos(token)
-    league_id = league_infos[0]["id"]
 
     players_on_market = get_players_on_market(token, league_id)
 
@@ -80,6 +100,6 @@ def join_current_market(token, today_df_results):
     bid_df = bid_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
 
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "team_name", "date", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return bid_df

@@ -1,6 +1,7 @@
-from pipeline.predictions import live_data_predictions, join_current_market
+from pipeline.predictions import live_data_predictions, join_current_market, join_current_squad
 from pipeline.preprocessing import preprocess_player_data, split_data
 from pipeline.modeling import train_model, evaluate_model
+from kickbase_api.league_data import get_league_id
 from kickbase_api.user_management import login
 from pipeline.notifier import send_mail
 from pipeline.data_handler import (
@@ -13,19 +14,22 @@ from IPython.display import display
 from dotenv import load_dotenv
 import os
 
+# Load environment variables from .env file
+load_dotenv() 
+
+# ----------------- Notes & TODOs -----------------
+
 # TODO Analyze the team of the user and the potential market values changes there
-# TODO Change from 22:00 to 22:30, since mv updates take some time
+# TODO Add possibility to add league name to choose if playing in multiple leagues
+# TODO Add features like starting 11 probability, injuries, ...
 
-# ----------------- USER CONFIGURATION -----------------
-# Most settings can and should be left as default
+# ----------------- SYSTEM PARAMETERS -----------------
+# Should be left unchanged unless you know what you're doing
 
-competition_ids = [1]   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
 last_mv_values = 365    # in days, max 365
 last_pfm_values = 50    # in matchdays, max idk
 
-
-# features for training and prediction
-# TODO Add features like starting 11 probability, injuries, ...
+# which features to use for training and prediction
 features = [
     "p", "mv", "days_to_next", 
     "mv_change_1d", "mv_trend_1d", 
@@ -36,17 +40,22 @@ features = [
 # what column to learn and predict on
 target = "mv_target_clipped"
 
-# Email to send recommendations to
-load_dotenv() 
-email = os.getenv("EMAIL_USER")
+# ----------------- USER SETTINGS -----------------
+# Adjust these settings to your preferences
 
-# ------------------------------------------------
+competition_ids = [1]   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
+email = os.getenv("EMAIL_USER") # Email to send recommendations to
+
+# ---------------------------------------------------
 
 # Load environment variables and login to kickbase
 USERNAME = os.getenv("KICK_USER")
 PASSWORD = os.getenv("KICK_PASS")
 token = login(USERNAME, PASSWORD)
 print("Logged in to Kickbase.")
+
+# Get league ID
+league_id = get_league_id(token)
 
 # Data handling
 create_player_data_table()
@@ -69,8 +78,10 @@ print(f"Model evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2f}
 live_predictions_df = live_data_predictions(today_df, model, features)
 
 # Join with current available players on the market
-bid_recommendations_df = join_current_market(token, live_predictions_df)
-display(bid_recommendations_df)
+market_recommendations_df = join_current_market(token, league_id, live_predictions_df)
+
+# Join with current players on the team
+squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
 
 # Send email with recommendations
-#send_mail(bid_recommendations_df, email)
+send_mail(market_recommendations_df, squad_recommendations_df, email)

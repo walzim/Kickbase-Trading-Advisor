@@ -3,13 +3,12 @@ from email.message import EmailMessage
 import smtplib
 import os
 
-def send_mail(data_df, email):
-    """Sends an email with the provided DataFrame as an HTML table."""
+def send_mail(market_df, squad_df, email):
+    """Sends an email with the provided DataFrames as HTML tables."""
     EMAIL_ADDRESS = os.getenv("EMAIL_USER")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
 
     # Today's date
-    # Get today's date, adjusting if it's after 22:00
     now = datetime.now()
     date_to_show = now + timedelta(days=1) if now.hour >= 22 else now
     today = date_to_show.strftime("%d-%m-%Y")
@@ -20,7 +19,23 @@ def send_mail(data_df, email):
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = email
 
-    # Set email content 
+    # Styling function for DataFrames
+    def style_df(df):
+        return df.to_html(index=False, border=0, classes="dataframe", escape=False).replace(
+            "<table",
+            '<table style="width:100%;border-collapse:collapse;font-size:13px;margin:20px 0;"'
+        ).replace(
+            "<th>",
+            '<th style="background:#2c3e50;color:white;padding:8px;text-align:left;border-bottom:1px solid #ddd;">'
+        ).replace(
+            "<td>",
+            '<td style="padding:8px;border-bottom:1px solid #eee;">'
+        ).replace(
+            '<tr style="text-align: right;">',
+            '<tr style="background-color:#fefefe;">'
+        )
+
+    # Set email content
     msg.set_content("Sorry, results only via html visible.", subtype="plain")
     msg.add_alternative(f"""\
     <html>
@@ -30,21 +45,16 @@ def send_mail(data_df, email):
         <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
         
         <p style="font-size: 14px; color: #333;">Greetings!<br><br>
-        The available players and their <b>predicted market values</b> for the next day are listed below. Only players with a substantial positive predicted market value are shown.</p>
 
-        {data_df.to_html(index=False, border=0, classes='dataframe', escape=False).replace(
-            '<table',
-            '<table style="width:100%;border-collapse:collapse;font-size:13px;margin:20px 0;"'
-        ).replace(
-            '<th>',
-            '<th style="background:#2c3e50;color:white;padding:8px;text-align:left;border-bottom:1px solid #ddd;">'
-        ).replace(
-            '<td>',
-            '<td style="padding:8px;border-bottom:1px solid #eee;">'
-        ).replace(
-            '<tr style="text-align: right;">',
-            '<tr style="background-color:#fefefe;">'
-        )}
+        <h3 style="color: #2c3e50; margin-top: 30px;">Current Market Predictions</h3>
+        The following table shows all available players with a substantial positive predicted market value for the next day:</p>
+
+        {style_df(market_df)}
+
+        <h3 style="color: #2c3e50; margin-top: 30px;">Your Squad Predictions</h3>
+        <p style="font-size: 14px; color: #333;">Here are the predicted market values for all players currently in your squad:</p>
+
+        {style_df(squad_df)}
 
         <p style="margin-top: 20px; font-size: 14px;">Best regards, <br><b>Your KickAdvisor Bot</b></p>
         
@@ -63,7 +73,7 @@ def send_mail(data_df, email):
 
     # Send email via Gmail SMTP
     with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
-        smtp.starttls()  # Upgrade connection to secure
+        smtp.starttls()
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         smtp.send_message(msg)
 

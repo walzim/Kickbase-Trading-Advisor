@@ -44,3 +44,9 @@ def get_budget(token, league_id):
     data = resp.json()
 
     print(data)
+
+def get_league_id(token, league_name=""):
+    league_infos = get_leagues_infos(token)
+    league_id = league_infos[0]["id"]
+
+    return league_id

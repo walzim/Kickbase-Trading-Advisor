@@ -14,3 +14,12 @@ def login(username, password):
     data = resp.json()
     token = data.get("tkn")
     return token
+
+def get_players_in_squad(token, league_id):
+    url = f"{BASE_URL}/leagues/{league_id}/squad"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    return data

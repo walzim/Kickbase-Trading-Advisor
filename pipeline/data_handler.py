@@ -44,8 +44,8 @@ def check_if_data_reload_needed():
     """Check if data reload is needed based on the last entry with null market value"""
 
     now = datetime.now()
-    today = now.date()
-    current_hour = now.hour
+    today_datetime = now
+    today_date = now.date()
 
     # Get nearest entry to today where mv is null
     with sqlite3.connect("player_data_total.db") as conn:
@@ -81,15 +81,15 @@ def check_if_data_reload_needed():
             return True
 
         # Cutoff-Time: 22:15 Uhr
-        cutoff = today.replace(hour=22, minute=15, second=0, microsecond=0)
+        cutoff = today_datetime.replace(hour=22, minute=15, second=0, microsecond=0)
 
         # If it is before 22:15 then yesterday should exist in the database with a mv value 
         # or today should exist with a null mv value
-        if now < cutoff and (last_non_null_entry == today - timedelta(days=1) or last_null_entry == today):
+        if now < cutoff and (last_non_null_entry == today_date - timedelta(days=1) or last_null_entry == today_date):
             return False
 
         # If it is after 22:15 then tomorrow should exist in the database with a mv value
-        elif now >= cutoff and last_non_null_entry == today + timedelta(days=1):
+        elif now >= cutoff and last_non_null_entry == today_date + timedelta(days=1):
             return False
         
         # Any other case we need to reload

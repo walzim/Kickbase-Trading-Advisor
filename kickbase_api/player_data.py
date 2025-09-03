@@ -165,7 +165,6 @@ def get_player_performance(token, competition_id, player_id, last_pfm_values, pl
     return result
 
 
-
 def get_max_date(data: dict, day: int) -> str | None:
     max_dt = None
 
