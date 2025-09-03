@@ -19,11 +19,11 @@ def live_data_predictions(today_df, model, features):
     # Sort by predicted_mv_target descending
     today_df_results = today_df_results.sort_values("predicted_mv_target", ascending=False)
 
-    # Filter date to today or yesterday if before 22:00, because mv is updated around 22:00
+    # Filter date to today or yesterday if before 22:15, because mv is updated around 22:15
     now = datetime.now()
-    date = (now - timedelta(days=1)) if now.hour <= 22 else now
+    cutoff_time = now.replace(hour=22, minute=15, second=0, microsecond=0)
+    date = (now - timedelta(days=1)) if now <= cutoff_time else now
     date = date.date()
-    today_df_results = today_df_results[today_df_results["date"].dt.date == date]
 
     # Drop rows where NaN mv
     today_df_results = today_df_results.dropna(subset=["mv"])
@@ -32,6 +32,10 @@ def live_data_predictions(today_df, model, features):
     today_df_results = today_df_results[["player_id", "first_name", "last_name", "position", "team_name", "date", "mv_change_1d", "mv_trend_1d", "mv", "predicted_mv_target"]]
 
     return today_df_results
+
+
+def join_current_teamet(token, today_df_results):
+    pass
 
 
 # TODO Add fail-safe check before player expires if the prob (starting 11) is still high, so no injuries or anything. if it dropped. dont bid / reccommend
@@ -63,6 +67,9 @@ def join_current_market(token, today_df_results):
     # If hours_to_exp < diff then it expires today
     bid_df["expiring_today"] = bid_df["hours_to_exp"] < diff
 
+    # Drop rows where predicted_mv_target is less than 5000
+    bid_df = bid_df[bid_df["predicted_mv_target"] > 5000]
+
     # Sort by predicted_mv_target descending
     bid_df = bid_df.sort_values("predicted_mv_target", ascending=False)
 
@@ -73,6 +80,6 @@ def join_current_market(token, today_df_results):
     bid_df = bid_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
 
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["first_name", "last_name", "team_name", "date", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return bid_df

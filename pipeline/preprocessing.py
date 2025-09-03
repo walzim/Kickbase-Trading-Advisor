@@ -64,7 +64,8 @@ def preprocess_player_data(df):
     # TODO: Move this into separate function
     # 7. Cutout todays values and store them
     now = datetime.now()
-    max_date = (now - timedelta(days=1)) if now.hour <= 22 else now
+    cutoff_time = now.replace(hour=22, minute=15, second=0, microsecond=0)
+    max_date = (now - timedelta(days=1)) if now <= cutoff_time else now
     max_date = max_date.date()
 
     today_df = df[df["date"].dt.date >= max_date]
