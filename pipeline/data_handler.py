@@ -4,7 +4,7 @@ from kickbase_api.player_data import (
     get_player_market_value,
     get_player_performance,
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 import concurrent.futures
 import pandas as pd
 import sqlite3
@@ -50,6 +50,8 @@ def check_if_data_reload_needed():
     # Get nearest entry to today where mv is null
     with sqlite3.connect("player_data_total.db") as conn:
         cursor = conn.cursor()
+
+        # Get the most recent date where mv is NULL
         cursor.execute("SELECT date FROM player_data_1d WHERE mv IS NULL ORDER BY date ASC LIMIT 1;")
         last_null_entry = cursor.fetchone()
 
@@ -57,19 +59,44 @@ def check_if_data_reload_needed():
         if last_null_entry is not None:
             last_null_entry = datetime.fromisoformat(last_null_entry[0]).date()
 
-        # If this entry is after today then we are up to date #TODO change this so it looks if there is an entry for tomorrow
-        # TODO If we dont do this, we will never update the data bc we always store the next matchday as rows,so there will always be a future date with null mv 
-        if last_null_entry is not None and last_null_entry > today:
-            reload_data = False
-        # If this entry is today and it is before 22:00 then we are up to date
-        elif last_null_entry is not None and last_null_entry == today and current_hour < 22:
-            reload_data = False
-        # All other cases: last entry before today or last entry today but after 22:00
-        else:
-            print(f"Data reload needed. This takes a few minutes...")
-            reload_data = True
+        # Get the most recent date where mv is NOT NULL and at least 100 rows have this date
+        # Hardcoded 100, bc if a player transfers on day x, he immediately has a mv value on day x and we dont want that
+        cursor.execute("""
+            SELECT date
+            FROM player_data_1d
+            WHERE mv IS NOT NULL
+            GROUP BY date
+            HAVING COUNT(*) >= 100
+            ORDER BY date DESC
+            LIMIT 1;
+        """)
+        last_non_null_entry = cursor.fetchone()
 
-    return reload_data
+        # convert last_non_null_entry (timestamp) to date
+        if last_non_null_entry is not None:
+            last_non_null_entry = datetime.fromisoformat(last_non_null_entry[0]).date()
+
+        # If there are no entries with null mv or no entries with non-null mv, we need to reload
+        if last_null_entry is None or last_non_null_entry is None:
+            return True
+
+        # Cutoff-Time: 22:15 Uhr
+        cutoff = today.replace(hour=22, minute=15, second=0, microsecond=0)
+
+        # If it is before 22:15 then yesterday should exist in the database with a mv value 
+        # or today should exist with a null mv value
+        if now < cutoff and (last_non_null_entry == today - timedelta(days=1) or last_null_entry == today):
+            return False
+
+        # If it is after 22:15 then tomorrow should exist in the database with a mv value
+        elif now >= cutoff and last_non_null_entry == today + timedelta(days=1):
+            return False
+        
+        # Any other case we need to reload
+        else:
+            print("Data reload needed, this takes a few minutes...")
+            return True
+
 
 def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_values, reload_data):
     """Fetch player data and save to SQLite database if reload_data is needed"""
