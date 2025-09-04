@@ -39,13 +39,12 @@
 	       </ul>
       </ul>
     </li>
-   <li><strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow". It should take at max about 2 minutes. If everything works, you will receive an email. If not, check that all secrets were added correctly. After this, the tool will run automatically every day between approximately 22:30 and 23:30. Due to GitHub Actions limitations, the execution time may occasionally be delayed.</li>
+   <li><strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow". It should take at max about 2 minutes. If everything works, you will receive an email. If not, check that all secrets were added correctly. After this, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file. </li>
   </ol>
 </div>
 <div align="justify">
-<strong>Note: </strong>Of course, the tool can be used without the email notifier. Just comment out the last line in <code>daily_predictions.py</code>, and the results will still be displayed in the GitHub Action execution log. It can also be run locally without GitHub Actions: for this, create a <code>.env</code> file with the same credentials you used in your secrets. You can execute the main file <code>daily_predictions.py</code> at any time during the day to get results, you are not limited to the scheduled execution. The scheduled time can also be changed in the <code>actions.yml</code> file. If you have any further questions or find any issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
+<strong>Other Use Case Options: </strong>The tool can be used without the email notifier. Just comment out the last line in <code>daily_predictions.py</code>, and the results will still be displayed in the GitHub Action execution log. As described in the third step "Test Your Setup", you can also always execute the workflow manually, and you are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed, and the packages needed, which are listed in requirements.txt. At last, create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If you have any further questions or find any issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
 </div>
-
 
 <h2 align="center">Future Work & Limitations</h2>
   <li>TODO</li>
