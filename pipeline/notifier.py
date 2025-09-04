@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from email.message import EmailMessage
+from zoneinfo import ZoneInfo
 import smtplib
 import os
 
@@ -8,8 +9,8 @@ def send_mail(market_df, squad_df, email):
     EMAIL_ADDRESS = os.getenv("EMAIL_USER")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
 
-    # Today's date
-    now = datetime.now()
+    # If it's 22:00 or later, show tomorrow's date; else today
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
     date_to_show = now + timedelta(days=1) if now.hour >= 22 else now
     today = date_to_show.strftime("%d-%m-%Y")
 

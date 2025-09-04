@@ -5,6 +5,7 @@ from kickbase_api.player_data import (
     get_player_performance,
 )
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import concurrent.futures
 import pandas as pd
 import sqlite3
@@ -43,8 +44,7 @@ def create_player_data_table():
 def check_if_data_reload_needed():
     """Check if data reload is needed based on the last entry with null market value"""
 
-    now = datetime.now()
-    today_datetime = now
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
     today_date = now.date()
 
     # Get nearest entry to today where mv is null
@@ -81,7 +81,7 @@ def check_if_data_reload_needed():
             return True
 
         # Cutoff-Time: 22:15 Uhr
-        cutoff = today_datetime.replace(hour=22, minute=15, second=0, microsecond=0)
+        cutoff = now.replace(hour=22, minute=15, second=0, microsecond=0)
 
         # If it is before 22:15 then yesterday should exist in the database with a mv value 
         # or today should exist with a null mv value

@@ -20,7 +20,6 @@ load_dotenv()
 # ----------------- Notes & TODOs -----------------
 
 # TODO Fix the UTC timezone problems in the github actions scheduling
-# TODO Dynamic approach with the 22:00 cutoff, locally and using github actions and their utc timezone
 # TODO Add prediction of 3, 7 days, to give more context
 # TODO Based upon the overpay of the other users, calculate a max price to pay for a player
 # TODO Add features like starting 11 probability, injuries, ...

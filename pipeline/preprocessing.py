@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import pandas as pd
 import numpy as np
 
@@ -63,7 +64,7 @@ def preprocess_player_data(df):
 
     # TODO: Move this into separate function
     # 7. Cutout todays values and store them
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
     cutoff_time = now.replace(hour=22, minute=15, second=0, microsecond=0)
     max_date = (now - timedelta(days=1)) if now <= cutoff_time else now
     max_date = max_date.date()

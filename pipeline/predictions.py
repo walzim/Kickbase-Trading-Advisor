@@ -4,6 +4,7 @@ from kickbase_api.league_data import (
     get_leagues_infos,
     get_players_on_market,
 )
+from zoneinfo import ZoneInfo
 import pandas as pd
 import numpy as np
 
@@ -21,7 +22,7 @@ def live_data_predictions(today_df, model, features):
     today_df_results = today_df_results.sort_values("predicted_mv_target", ascending=False)
 
     # Filter date to today or yesterday if before 22:15, because mv is updated around 22:15
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
     cutoff_time = now.replace(hour=22, minute=15, second=0, microsecond=0)
     date = (now - timedelta(days=1)) if now <= cutoff_time else now
     date = date.date()
@@ -80,7 +81,7 @@ def join_current_market(token, league_id, today_df_results):
     bid_df["hours_to_exp"] = np.round((bid_df["exp"] / 3600), 2)
 
     # check if current sysdate + hours_to_exp is after the next 22:00
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Berlin"))
     next_22 = now.replace(hour=22, minute=0, second=0, microsecond=0)
     diff = np.round((next_22 - now).total_seconds() / 3600, 2)
 
