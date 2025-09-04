@@ -45,8 +45,9 @@ def get_budget(token, league_id):
 
     print(data)
 
-def get_league_id(token, league_name=""):
+def get_league_id(token, league_name):
     league_infos = get_leagues_infos(token)
-    league_id = league_infos[0]["id"]
+    selected_league = [league for league in league_infos if league["name"] == league_name]
+    league_id = selected_league[0]["id"]
 
     return league_id

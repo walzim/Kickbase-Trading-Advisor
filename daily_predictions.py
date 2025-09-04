@@ -21,7 +21,8 @@ load_dotenv()
 
 # TODO Fix the UTC timezone problems in the github actions scheduling
 # TODO Dynamic approach with the 22:00 cutoff, locally and using github actions and their utc timezone
-# TODO Add possibility to add league name to choose if playing in multiple leagues
+# TODO Add prediction of 3, 7 days, to give more context
+# TODO Based upon the overpay of the other users, calculate a max price to pay for a player
 # TODO Add features like starting 11 probability, injuries, ...
 
 # ----------------- SYSTEM PARAMETERS -----------------
@@ -44,8 +45,9 @@ target = "mv_target_clipped"
 # ----------------- USER SETTINGS -----------------
 # Adjust these settings to your preferences
 
-competition_ids = [1]               # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
-email = os.getenv("EMAIL_USER")     # Email to send recommendations to, can be the same as EMAIL_USER or different
+competition_ids = [1]                   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
+league_name = os.getenv("KICK_LEAGUE")  # Name of your league, must be exact match, can be done via env or hardcoded
+email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can be the same as EMAIL_USER or different
 
 # ---------------------------------------------------
 
@@ -56,7 +58,7 @@ token = login(USERNAME, PASSWORD)
 print("Logged in to Kickbase.")
 
 # Get league ID
-league_id = get_league_id(token)
+league_id = get_league_id(token, league_name)
 
 # Data handling
 create_player_data_table()
