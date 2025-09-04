@@ -10,7 +10,7 @@
 <div align="justify">
   <ol>
     <li>
-      <strong>Data Collection:</strong> Gets historical data from the API, including up to one year of player market values and performance stats. The performance data covers matchdays, points scored, minutes played, goals, winning team, and more.
+      <strong>Data Collection:</strong> Gets historical data from the API, including up to one year of player market values and performance stats. The performance data covers matchdays, points scored, minutes played, goals, and more.
     </li>
     <li>
       <strong>Feature Engineering:</strong> Adds extra metrics that are not directly in the API. These are calculated from the collected data and include things like market value trends, volatility, market divergence, and similar stats for more context.
@@ -26,12 +26,14 @@
 
 <h2 align="center">How Can You Use It?</h2>
 <div align="justify">
+<strong>Note:</strong> The default competition the tool trains and predicts on is the first German Bundesliga. If you would like to change this, go into the main <code>daily_predictions.py</code> file and change the value of the variable <code>competition_ids</code> on line 49.
   <ol>
 	    <li><strong>Fork the Repository:</strong> Click the "Fork" button to create a copy of this repository in your account.</li>
     <li><strong>Add Your Secrets:</strong> In your fork, add the following secrets.<br>
       <ul>
         <li><code>KICK_USER</code>: Your Kickbase Username (usually your email)</li>
         <li><code>KICK_PASS</code>: Your Kickbase Password (handled securely)</li>
+        <li><code>KICK_LEAGUE</code>: The Name of Your League (must be exact match)</li>
         <li><code>EMAIL_USER</code>: Your Email Address (for sending and receiving emails)</li>
         <li><code>EMAIL_PASS</code>: Password for Your Email Adress (potentially an app password)</li>
 		    <ul>
