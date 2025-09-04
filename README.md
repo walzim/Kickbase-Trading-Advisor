@@ -30,6 +30,8 @@
 <strong>Note:</strong> The default competition of the tool is the first German Bundesliga. If you would like to change this, go into the main <code>daily_predictions.py</code> file and change the value of the variable <code>competition_ids</code> on line 49.
 </div>
 
+<br>
+
 <div align="justify">
   <ol>
 	    <li><strong>Fork the Repository:</strong> Click the "Fork" button to create a copy of this repository in your account.</li>
