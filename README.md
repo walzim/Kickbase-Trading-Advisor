@@ -35,11 +35,11 @@
 <div align="justify">
   <ol>
 	    <li><strong>Fork the Repository:</strong> Click the "Fork" button to create a copy of this repository in your account.</li>
+	<li><strong>Set League Name:</strong> In the file <code>daily_predictions.py</code> on line 48, change <code>league_name = "Your League Name"</code> to the name of your league. This must exactly match the name of your league, including spaces and uppercase/lowercase letters.</li>
     <li><strong>Add Your Secrets:</strong> In your fork, add the following secrets.<br>
       <ul>
         <li><code>KICK_USER</code>: Your Kickbase Username (usually your email)</li>
         <li><code>KICK_PASS</code>: Your Kickbase Password (handled securely)</li>
-        <li><code>KICK_LEAGUE</code>: The Name of Your League (must be exact match)</li>
         <li><code>EMAIL_USER</code>: Your Email Address (for sending and receiving emails)</li>
         <li><code>EMAIL_PASS</code>: Password for Your Email Adress (potentially an app password)</li>
 		    <ul>
@@ -47,7 +47,7 @@
 	       </ul>
       </ul>
     </li>
-   <li><strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow". It should take at max about 2 minutes. If everything works, you will receive an email. If not, check that all secrets were added correctly. After this, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file. </li>
+   <li><strong>Test Your Setup:</strong> Go to the "Actions" tab in your fork. Click "Run Daily Predictions" and then "Run Workflow". It should take at max about 2 minutes. If everything works, you will receive an email. If not, check that all secrets and your league name have been added correctly. After this, the tool will run automatically every day between approximately 22:30 and 23:30. The scheduled time can also be changed in the <code>actions.yml</code> file. </li>
   </ol>
 </div>
 
