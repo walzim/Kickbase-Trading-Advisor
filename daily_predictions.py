@@ -88,4 +88,4 @@ squad_recommendations_df = join_current_squad(token, league_id, live_predictions
 display(squad_recommendations_df)
 
 # Send email with recommendations
-#send_mail(market_recommendations_df, squad_recommendations_df, email)
+send_mail(market_recommendations_df, squad_recommendations_df, email)
