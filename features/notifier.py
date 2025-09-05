@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import smtplib
 import os
 
-def send_mail(market_df, squad_df, email):
+def send_mail(bduget_df, market_df, squad_df, email):
     """Sends an email with the provided DataFrames as HTML tables."""
     EMAIL_ADDRESS = os.getenv("EMAIL_USER")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
@@ -45,10 +45,14 @@ def send_mail(market_df, squad_df, email):
         
         <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
         
-        <p style="font-size: 14px; color: #333;">Greetings!<br>
+        <p style="font-size: 14px; color: #333;">Greetings!</p><br>
+
+        <h3 style="color: #2c3e50; margin-top: 30px;">Manager Budgets</h3>
+        <p style="font-size: 14px; color: #333;">Here are the current budgets of all managers in your league:</p>
+        {style_df(bduget_df)}
 
         <h3 style="color: #2c3e50; margin-top: 30px;">Current Market Predictions</h3>
-        The following table shows all available players with a substantial positive predicted market value for the next day:</p>
+        <p style="font-size: 14px; color: #333;">The following table shows all available players with a substantial positive predicted market value for the next day:</p>
 
         {style_df(market_df)}
 
