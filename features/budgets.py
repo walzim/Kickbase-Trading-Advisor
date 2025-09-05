@@ -1,15 +1,14 @@
-from kickbase_api.league_data import get_activities, get_achievement_reward
+from kickbase_api.league_data import get_activities, get_achievement_reward, get_managers, get_manager_performance
 import pandas as pd
 
 def calc_manager_budgets(token, league_id, start_budget):
 
-    data, login_bonus, achievement_bonus = get_activities(token, league_id)
+    activities, login_bonus, achievement_bonus = get_activities(token, league_id)
     
-    activities_df = pd.DataFrame(data)
+    activities_df = pd.DataFrame(activities)
 
     # calculate total login bonus given out and achievements
     total_login_bonus = sum(entry["data"]["bn"] for entry in login_bonus)
-    print(f"Total login bonus given out: {total_login_bonus}")
 
     # calculate total achievement bonus given out
     total_achievement_bonus = 0
@@ -17,10 +16,18 @@ def calc_manager_budgets(token, league_id, start_budget):
         a_id = item["data"]["t"]
         achievement_reward = get_achievement_reward(token, league_id, a_id)
         total_achievement_bonus += achievement_reward
-    print(f"Total achievement bonus given out: {total_achievement_bonus}")
 
-    # TODO money for points
-    
+    # get all managers and their total points
+    managers = get_managers(token, league_id)
+    all_perfs = []
+    for manager in managers:
+        perf = get_manager_performance(token, league_id, manager[1], manager[0])
+        all_perfs.append(perf)
+
+    perf_df = pd.DataFrame(all_perfs)
+    perf_df["point_bonus"] = perf_df["tp"] * 1000
+
+    # get budgets through activities
     budgets = {}
 
     # get all managers
@@ -43,7 +50,13 @@ def calc_manager_budgets(token, league_id, start_budget):
             budgets[byr] -= trp
             budgets[slr] += trp
 
-    budget_df = pd.DataFrame(list(budgets.items()), columns=["User", "Budget"]).sort_values("Budget", ascending=False)
+    budget_df = pd.DataFrame(list(budgets.items()), columns=["User", "Budget"])
+
+    # add point bonus to budgets
+    budget_df = budget_df.merge(perf_df[["name", "point_bonus"]], left_on="User", right_on="name", how="left").drop(columns=["name"])
+    budget_df["Budget"] += budget_df["point_bonus"].fillna(0)
+    budget_df = budget_df.drop(columns=["point_bonus"])
+    budget_df = budget_df.sort_values("Budget", ascending=False).reset_index(drop=True)
 
     # Add login and achievement bonuses to all managers the same
     budget_df["Budget"] += (total_login_bonus + total_achievement_bonus)
