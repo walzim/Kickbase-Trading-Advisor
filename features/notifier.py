@@ -45,7 +45,7 @@ def send_mail(bduget_df, market_df, squad_df, email):
         
         <h2 style="color: #2c3e50; text-align: center; margin-top: 0;">Kickbase Report for {today}</h2>
         
-        <p style="font-size: 14px; color: #333;">Greetings!</p><br>
+        <p style="font-size: 14px; color: #333;">Greetings!</p>
 
         <h3 style="color: #2c3e50; margin-top: 30px;">Manager Budgets</h3>
         <p style="font-size: 14px; color: #333;">Here are the current budgets of all managers in your league:</p>
