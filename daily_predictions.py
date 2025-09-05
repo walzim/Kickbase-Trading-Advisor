@@ -1,15 +1,16 @@
-from pipeline.predictions import live_data_predictions, join_current_market, join_current_squad
-from pipeline.preprocessing import preprocess_player_data, split_data
-from pipeline.modeling import train_model, evaluate_model
-from kickbase_api.league_data import get_league_id
+from features.predictions.predictions import live_data_predictions, join_current_market, join_current_squad
+from features.predictions.preprocessing import preprocess_player_data, split_data
+from features.predictions.modeling import train_model, evaluate_model
+from kickbase_api.league_data import get_league_id, get_activities
 from kickbase_api.user_management import login
-from pipeline.notifier import send_mail
-from pipeline.data_handler import (
+from features.notifier import send_mail
+from features.predictions.data_handler import (
     create_player_data_table,
     check_if_data_reload_needed,
     save_player_data_to_db,
     load_player_data_from_db,
 )
+from features.budgets import calc_manager_budgets
 from IPython.display import display
 from dotenv import load_dotenv
 import os
@@ -23,6 +24,7 @@ load_dotenv()
 # TODO Add prediction of 3, 7 days, to give more context
 # TODO Based upon the overpay of the other users, calculate a max price to pay for a player
 # TODO Add features like starting 11 probability, injuries, ...
+# TODO based upon activities, calculate the current budget of the other managers
 
 # ----------------- SYSTEM PARAMETERS -----------------
 # Should be left unchanged unless you know what you're doing
@@ -46,6 +48,7 @@ target = "mv_target_clipped"
 
 competition_ids = [1]                   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
 league_name = "Die 10 Nuggatschleusen"  # Name of your league, must be exact match, can be done via env or hardcoded
+start_budget = 50_000_000              # Starting budget of your league, used to calculate current budgets of other managers
 email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can be the same as EMAIL_USER or different
 
 # ---------------------------------------------------
@@ -58,6 +61,10 @@ print("Logged in to Kickbase.")
 
 # Get league ID
 league_id = get_league_id(token, league_name)
+
+# Calculate (estimated) budgets of all managers in the league
+manager_budgets_df = calc_manager_budgets(token, league_id, start_budget)
+display(manager_budgets_df)
 
 # Data handling
 create_player_data_table()
@@ -88,4 +95,4 @@ squad_recommendations_df = join_current_squad(token, league_id, live_predictions
 display(squad_recommendations_df)
 
 # Send email with recommendations
-send_mail(market_recommendations_df, squad_recommendations_df, email)
+send_mail(manager_budgets_df, market_recommendations_df, squad_recommendations_df, email)
