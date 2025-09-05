@@ -1,7 +1,7 @@
 from features.predictions.predictions import live_data_predictions, join_current_market, join_current_squad
 from features.predictions.preprocessing import preprocess_player_data, split_data
 from features.predictions.modeling import train_model, evaluate_model
-from kickbase_api.league_data import get_league_id, get_activities
+from kickbase_api.league_data import get_league_id
 from kickbase_api.user_management import login
 from features.notifier import send_mail
 from features.predictions.data_handler import (
