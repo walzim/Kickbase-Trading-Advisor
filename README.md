@@ -2,24 +2,24 @@
 
 <div align="justify">
   <p>
-    <strong>Kickbase Trading Advisor:</strong> A helper for the fantasy football game <a href="https://www.kickbase.com" target="_blank" rel="noopener">Kickbase</a>, built to predict next-day player market value movements. Each day, you’ll receive an email with predicted market value changes for all players currently on your league’s transfer market and on your personal squad. This project uses the community <a href="https://kevinskyba.github.io/kickbase-api-doc/index.html" target="_blank" rel="noopener">Kickbase API</a> by <a href="https://github.com/kevinskyba" target="_blank" rel="noopener">kevinskyba</a>, big shoutout!
+    <strong>Kickbase Trading Advisor:</strong> A helper for the fantasy football game <a href="https://www.kickbase.com" target="_blank" rel="noopener">Kickbase</a>, designed to assist you in making the best trading decisions. The tool estimates other managers' budgets, predicts future player market values, and sends this information to you daily via email. More features and improvements are planned. This project uses the community <a href="https://kevinskyba.github.io/kickbase-api-doc/index.html" target="_blank" rel="noopener">Kickbase API</a> by <a href="https://github.com/kevinskyba" target="_blank" rel="noopener">kevinskyba</a>, big shoutout!
   </p>
 </div>
 
-<h2 align="center">What Does the Tool Do?</h2>
+<h2 align="center">Features</h2>
 <div align="justify">
   <ol>
+<li>
+  <strong>Manager Budget Calculation:</strong> Based on the activity log in each Kickbase league and the points-to-money reward for each matchday, the tool estimates each manager's current budget. Since there is no access to other players' login bonuses or achievements, your own are used for the estimation. While not perfect, this approach still provides an accurate and practical estimate.
+</li>
+<li>
+  <strong>Market Value Prediction:</strong> Using selected features such as points, minutes played, current market value, recent value changes, and more, a machine learning model predicts the market value change for the following day. This is done for all players currently on the market as well as those in your squad.
+</li>
+<li>
+  <strong>Email Notifier:</strong> The results from the previous features are then sent to you via email each day around 23:00 (+-45 minutes), always after the market value updates around 22:00. As explained below, you can also run this manually at any time, without waiting for the scheduled execution.
+</li>
     <li>
-      <strong>Data Collection:</strong> Gets historical data from the API, including up to one year of player market values and performance stats. The performance data covers matchdays, points scored, minutes played, goals, and more.
-    </li>
-    <li>
-      <strong>Feature Engineering:</strong> Adds extra metrics that are not directly in the API. These are calculated from the collected data and include things like market value trends, volatility, market divergence, and similar stats for more context.
-    </li>
-    <li>
-      <strong>Model Training:</strong> Uses a Random Forest Regressor to learn how these features relate to future market value changes. The model is trained to spot patterns and make predictions about next-day market movements.
-    </li>
-    <li>
-      <strong>Daily Recommendations:</strong> Takes the model’s predictions and compares them with the players listed on your league’s market and your own squad. The results are then sent to you by email every evening at around 22:30 after the market values update.
+      <strong>More Features in The Future:</strong> ...
     </li>
   </ol>
 </div>
@@ -56,6 +56,5 @@
 </div>
 
 <h2 align="center">Future Work & Ideas</h2>
-  <li>Budget calculation of the other managers</li>
   <li>Three days and one week market predictions</li>
-  <li>Overpay calculator, based upon patterns of the other managers</li>
+  <li>Overpay calculator, based on budget and more</li>
