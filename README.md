@@ -55,5 +55,7 @@
 <strong>Other Use Case Options: </strong>The tool can be used without the email notifier. Just comment out the last line in <code>daily_predictions.py</code>, and the results will still be displayed in the GitHub Action execution log. As described in the third step "Test Your Setup", you can also always execute the workflow manually, and you are not bound to the scheduled time. The tool can also be used locally without GitHub Actions: for this, you need to have Python installed, and the packages needed, which are listed in requirements.txt. At last, create a <code>.env</code> file in the root folder with the same credentials you used in your secrets. You can then execute the main file <code>daily_predictions.py</code>. If you have any further questions or find any issues, please use the "Issues" tab at the top of the repository or contact me via the email listed on my GitHub profile.
 </div>
 
-<h2 align="center">Future Work & Limitations</h2>
-  <li>TODO</li>
+<h2 align="center">Future Work & Ideas</h2>
+  <li>Budget calculation of the other managers</li>
+  <li>Three days and one week market predictions</li>
+  <li>Overpay calculator, based upon patterns of the other managers</li>
