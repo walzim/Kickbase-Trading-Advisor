@@ -57,13 +57,14 @@ email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can 
 USERNAME = os.getenv("KICK_USER")
 PASSWORD = os.getenv("KICK_PASS")
 token = login(USERNAME, PASSWORD)
-print("Logged in to Kickbase.")
+print("\nLogged in to Kickbase.")
 
 # Get league ID
 league_id = get_league_id(token, league_name)
 
 # Calculate (estimated) budgets of all managers in the league
 manager_budgets_df = calc_manager_budgets(token, league_id, league_start_date, start_budget)
+print("\n=== Manager Budgets ===")
 display(manager_budgets_df)
 
 # Data handling
@@ -71,27 +72,29 @@ create_player_data_table()
 reload_data = check_if_data_reload_needed()
 save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_values, reload_data)
 player_df = load_player_data_from_db()
-print("Data loaded from database.")
+print("\nData loaded from database.")
 
 # Preprocess the data and spit the data
 proc_player_df, today_df = preprocess_player_data(player_df)
 X_train, X_test, y_train, y_test = split_data(proc_player_df, features, target)
-print("Data preprocessed.")
+print("\nData preprocessed.")
 
 # Train and evaluate the model
 model = train_model(X_train, y_train)
 signs_percent, rmse, mae, r2 = evaluate_model(model, X_test, y_test)
-print(f"Model evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2f}\nMAE: {mae:.2f}\nR2: {r2:.2f}")
+print(f"\nModel evaluation:\nSigns correct: {signs_percent:.2f}%\nRMSE: {rmse:.2f}\nMAE: {mae:.2f}\nR2: {r2:.2f}")
 
 # Make live data predictions
 live_predictions_df = live_data_predictions(today_df, model, features)
 
 # Join with current available players on the market
 market_recommendations_df = join_current_market(token, league_id, live_predictions_df)
+print("\n=== Market Recommendations ===")
 display(market_recommendations_df)
 
 # Join with current players on the team
 squad_recommendations_df = join_current_squad(token, league_id, live_predictions_df)
+print("\n=== Squad Recommendations ===")
 display(squad_recommendations_df)
 
 # Send email with recommendations

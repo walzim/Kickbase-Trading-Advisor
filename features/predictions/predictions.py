@@ -58,7 +58,7 @@ def join_current_squad(token, league_id, today_df_results):
     squad_df = squad_df.rename(columns={"mv_x": "mv"})
 
     # Keep only relevant columns
-    squad_df = squad_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob"]]
+    squad_df = squad_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob"]]
 
     return squad_df  # Debugging line to inspect the response structure
 
@@ -102,6 +102,6 @@ def join_current_market(token, league_id, today_df_results):
     bid_df = bid_df.rename(columns={"mv_change_1d": "mv_change_yesterday"})
 
     # Keep only relevant columns
-    bid_df = bid_df[["first_name", "last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
+    bid_df = bid_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob", "hours_to_exp", "expiring_today"]]
 
     return bid_df

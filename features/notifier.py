@@ -82,4 +82,4 @@ def send_mail(bduget_df, market_df, squad_df, email):
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         smtp.send_message(msg)
         
-    print("Email sent successfully!")
+    print("\nEmail sent successfully!")
