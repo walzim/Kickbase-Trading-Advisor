@@ -36,6 +36,7 @@ def live_data_predictions(today_df, model, features):
     return today_df_results
 
 
+# TODO Some players are not listed here, since they are missing in today_df results (never played for the team before)
 def join_current_squad(token, league_id, today_df_results):
     squad_players = get_players_in_squad(token, league_id)
 
