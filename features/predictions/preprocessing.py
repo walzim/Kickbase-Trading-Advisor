@@ -8,7 +8,11 @@ def preprocess_player_data(df):
     
     # 1. Sort and filter
     df = df.sort_values(["player_id", "date"])
-    df = df[(df["team_id"] == df["t1"]) | (df["team_id"] == df["t2"])]  # keep only t1 or t2
+    df = df[     # Keep rows where team_id matches t1 or t2 OR where both t1 and t2 are missing
+        (df["team_id"] == df["t1"]) |
+        (df["team_id"] == df["t2"]) |
+        (df["t1"].isna() & df["t2"].isna())
+    ]
 
     # Convert date columns to datetime
     df["date"] = pd.to_datetime(df["date"])
