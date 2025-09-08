@@ -13,7 +13,7 @@ from features.predictions.data_handler import (
 from features.budgets import calc_manager_budgets
 from IPython.display import display
 from dotenv import load_dotenv
-import os
+import os, pandas as pd
 
 # Load environment variables from .env file
 load_dotenv() 
@@ -41,6 +41,14 @@ features = [
 
 # what column to learn and predict on
 target = "mv_target_clipped"
+
+# Set dot as thousands separator for better readability
+pd.options.display.float_format = lambda x: '{:,.0f}'.format(x).replace(',', '.')
+
+# Show all columns when displaying dataframes
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 1000)
 
 # ----------------- USER SETTINGS -----------------
 # Adjust these settings to your preferences
