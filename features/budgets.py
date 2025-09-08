@@ -61,7 +61,7 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
     # Add login and achievement bonuses to all managers the same
     budget_df["Budget"] += (total_login_bonus + total_achievement_bonus)
 
-    # convert to float for better readability
+    # convert to float for formatting
     budget_df["Budget"] = budget_df["Budget"].astype(float)
 
     return budget_df

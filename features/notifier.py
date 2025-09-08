@@ -6,6 +6,11 @@ import os
 
 def send_mail(bduget_df, market_df, squad_df, email):
     """Sends an email with the provided DataFrames as HTML tables."""
+
+    if not email:
+        print("\nNo email provided, skipping email sending.")
+        return
+
     EMAIL_ADDRESS = os.getenv("EMAIL_USER")
     EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
 
