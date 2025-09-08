@@ -46,16 +46,30 @@ def get_budget(token, league_id):
 
     print(data)
 
+
 def get_league_id(token, league_name):
     league_infos = get_leagues_infos(token)
+
+    if not league_infos:
+        print("Warning: You are not part of any league.")
+        return None
+
+    # Try to find leagues matching the given name
     selected_league = [league for league in league_infos if league["name"] == league_name]
-    league_id = selected_league[0]["id"]
 
-    return league_id
+    if not selected_league:
+        fallback_league = league_infos[0]
+        print(
+            f"Warning: No league found with name '{league_name}'. "
+            f"Falling back to the first available league: '{fallback_league['name']}'"
+        )
+        return fallback_league["id"]
 
-def get_activities(token, league_id):
-    # TODO magic number with 1000, have to find a better solution
-    # TODO instead of hardcoded date let the user provide it
+    return selected_league[0]["id"]
+
+
+def get_activities(token, league_id, league_start_date):
+    # TODO magic number with 5000, have to find a better solution
     url = f"{BASE_URL}/leagues/{league_id}/activitiesFeed?max=5000"
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(url, headers=headers)
@@ -63,11 +77,10 @@ def get_activities(token, league_id):
     data = resp.json()
 
     # Filter out entries prior to reset_Date
-    reset_Date = "2025-08-08T12:00:00Z"
     filtered_activities = []
     for entry in data["af"]:
         entry_date = entry.get("dt", "")
-        if entry_date >= reset_Date:
+        if entry_date >= league_start_date:
             filtered_activities.append(entry)
 
     login = [entry for entry in filtered_activities if entry.get("t") == 22]

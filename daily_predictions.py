@@ -24,7 +24,6 @@ load_dotenv()
 # TODO Add prediction of 3, 7 days, to give more context
 # TODO Based upon the overpay of the other users, calculate a max price to pay for a player
 # TODO Add features like starting 11 probability, injuries, ...
-# TODO based upon activities, calculate the current budget of the other managers
 
 # ----------------- SYSTEM PARAMETERS -----------------
 # Should be left unchanged unless you know what you're doing
@@ -47,8 +46,9 @@ target = "mv_target_clipped"
 # Adjust these settings to your preferences
 
 competition_ids = [1]                   # 1 = Bundesliga, 2 = 2. Bundesliga, 3 = La Liga
-league_name = "Kegelbrüder OS"  # Name of your league, must be exact match, can be done via env or hardcoded
-start_budget = 50_000_000              # Starting budget of your league, used to calculate current budgets of other managers
+league_name = "Die 10 Nuggatschleusen"  # Name of your league, must be exact match, can be done via env or hardcoded
+start_budget = 50_000_000               # Starting budget of your league, used to calculate current budgets of other managers
+league_start_date = "2025-08-08"        # Start date of your league, used to filter activities, format: YYYY-MM-DD
 email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can be the same as EMAIL_USER or different
 
 # ---------------------------------------------------
@@ -63,7 +63,7 @@ print("Logged in to Kickbase.")
 league_id = get_league_id(token, league_name)
 
 # Calculate (estimated) budgets of all managers in the league
-manager_budgets_df = calc_manager_budgets(token, league_id, start_budget)
+manager_budgets_df = calc_manager_budgets(token, league_id, league_start_date, start_budget)
 display(manager_budgets_df)
 
 # Data handling
