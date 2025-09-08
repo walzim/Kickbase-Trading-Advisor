@@ -49,6 +49,8 @@ def join_current_squad(token, league_id, today_df_results):
     )
 
     # Rename prob to s_11_prob for better understanding
+    if "prob" not in squad_df.columns:
+        squad_df["prob"] = np.nan  # Placeholder for non-pro users
     squad_df = squad_df.rename(columns={"prob": "s_11_prob"})
 
     # Rename mv_change_1d to mv_change_yesterday for better understanding
@@ -96,6 +98,8 @@ def join_current_market(token, league_id, today_df_results):
     bid_df = bid_df.sort_values("predicted_mv_target", ascending=False)
 
     # Rename prob to s_11_prob for better understanding
+    if "prob" not in bid_df.columns:
+        bid_df["prob"] = np.nan  # Placeholder for non-pro users
     bid_df = bid_df.rename(columns={"prob": "s_11_prob"})
 
     # Rename mv_change_1d to mv_change_yesterday for better understanding
