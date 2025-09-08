@@ -1,9 +1,9 @@
 from kickbase_api.league_data import get_activities, get_achievement_reward, get_managers, get_manager_performance
 import pandas as pd
 
-def calc_manager_budgets(token, league_id, start_budget):
+def calc_manager_budgets(token, league_id, league_start_date, start_budget):
 
-    activities, login_bonus, achievement_bonus = get_activities(token, league_id)
+    activities, login_bonus, achievement_bonus = get_activities(token, league_id, league_start_date)
     
     activities_df = pd.DataFrame(activities)
 
