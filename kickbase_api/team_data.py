@@ -35,7 +35,6 @@ def get_matchdays(token, competition_id):
         for match in item.get("it", [])
     ]
 
-    # Schritt 2: pro day das maximale Datum finden
     max_dates_per_day = {}
     for m in matches:
         day = m["day"]
@@ -43,7 +42,6 @@ def get_matchdays(token, competition_id):
         if day not in max_dates_per_day or date > max_dates_per_day[day]:
             max_dates_per_day[day] = date
 
-    # Schritt 3: Ergebnis in gewünschtem Format zurück in Strings
     result = [{"day": day, "date": max_dates_per_day[day].isoformat()} for day in sorted(max_dates_per_day)]
 
     return result
