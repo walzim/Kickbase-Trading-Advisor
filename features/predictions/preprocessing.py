@@ -86,7 +86,10 @@ def preprocess_player_data(df):
 def split_data(df, features, target):
     """Split the data into training and testing sets based on date to avoid data leakage"""
 
-    split_idx = int(len(df) * 0.8)
+    # Sort by date
+    df = df.sort_values("date").reset_index(drop=True)
+
+    split_idx = int(len(df) * 0.75)
     split_date = df["date"].iloc[split_idx]
 
     # Split by time, to avoid data leakage
