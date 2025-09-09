@@ -1,6 +1,7 @@
 from kickbase_api.user import get_budget, get_username
 from kickbase_api.league import (
     get_league_activities,
+    get_league_ranking
 )
 from kickbase_api.manager import (
     get_managers,
@@ -32,7 +33,6 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
             amount, reward = get_achievement_reward(token, league_id, a_id)
             total_achievement_bonus += amount * reward
         except Exception as e:
-            # Skip broken achievement entry
             print(f"Warning: Failed to process achievement bonus {item}: {e}")
 
     # Manager performances
@@ -95,8 +95,16 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
     budget_df.drop(columns=["point_bonus"], inplace=True, errors="ignore")
     budget_df.sort_values("Budget", ascending=False, inplace=True, ignore_index=True)
 
-    # Add global bonuses (TODO better solution, as this estimation is not perfect)
-    budget_df["Budget"] = budget_df["Budget"] + (total_login_bonus + total_achievement_bonus)
+    # add total login bonus equally to everyone (100% estimation, if the user logged in every day)
+    budget_df["Budget"] += total_login_bonus
+
+    # Ensure consistent float format
+    budget_df["Budget"] = budget_df["Budget"].astype(float)
+
+    # add total achievement bonus based on anchor value and current ranking (estimation approach)
+    for user in budget_df["User"]:
+        achievement_bonus = calc_achievement_bonus_by_points(token, league_id, user, total_achievement_bonus)
+        budget_df.loc[budget_df["User"] == user, "Budget"] += achievement_bonus
 
     # Sync with own actual budget
     try:
@@ -111,7 +119,80 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
     # Calculate available budget
     budget_df["Available Budget"] = (budget_df["Max Negative"].fillna(0) - budget_df["Budget"]) * -1
 
-    # Ensure consistent float format
-    budget_df["Budget"] = budget_df["Budget"].astype(float)
-
     return budget_df
+
+def calc_achievement_bonus_by_points(token, league_id, username, anchor_achievement_bonus):
+    """Estimate achievement bonus for a user based on their total points compared to anchor user."""
+
+    ranking = get_league_ranking(token, league_id)
+    ranking_df = pd.DataFrame(ranking, columns=["Name", "Total Points"])
+
+    # Total number of users
+    num_users = len(ranking_df)
+    if num_users == 0:
+        return 0
+
+    # Get anchor user's name and points
+    anchor_user = get_username(token)
+    anchor_row = ranking_df[ranking_df["Name"] == anchor_user]
+    if anchor_row.empty:
+        return 0
+    anchor_points = anchor_row["Total Points"].values[0]
+
+    # If the user is the anchor, return exactly the anchor achievement bonus
+    if username == anchor_user:
+        return anchor_achievement_bonus
+
+    # Get target user's points
+    user_row = ranking_df[ranking_df["Name"] == username]
+    if user_row.empty:
+        return 0
+    user_points = user_row["Total Points"].values[0]
+
+    # Calculate bonus scaling based on points ratio
+    if anchor_points == 0:
+        scale = 1.0
+    else:
+        scale = user_points / anchor_points
+
+    estimated_bonus = anchor_achievement_bonus * scale
+    return estimated_bonus
+
+def calc_achievement_bonus_by_rank(token, league_id, username, anchor_achievement_bonus):
+    """Estimate achievement bonus for a user based on their ranking."""
+    """Currently not used, kept for reference."""
+
+    ranking = get_league_ranking(token, league_id)
+    ranking_df = pd.DataFrame(ranking, columns=["Name", "Total Points"])
+
+    # Total number of users
+    num_users = len(ranking_df)
+    if num_users == 0:
+        return 0
+
+    # Get anchor user's name and rank
+    anchor_user = get_username(token)
+    anchor_row = ranking_df[ranking_df["Name"] == anchor_user]
+    if anchor_row.empty:
+        return 0
+    anchor_rank = anchor_row.index[0] + 1
+
+    # If the user is the anchor, return exactly the anchor achievement bonus
+    if username == anchor_user:
+        return anchor_achievement_bonus
+
+    # Get target user's rank and points
+    user_row = ranking_df[ranking_df["Name"] == username]
+    if user_row.empty:
+        return 0
+    user_rank = user_row.index[0] + 1
+
+    # Calculate bonus scaling based on rank difference
+    # If user is ranked lower (higher number): scale down
+    # If user is ranked higher (lower number): scale up
+    rank_diff = anchor_rank - user_rank
+    scale = 1.0 + (rank_diff * 0.1)
+
+    # Calculate estimated achievement bonus
+    estimated_bonus = anchor_achievement_bonus * scale
+    return estimated_bonus
