@@ -91,7 +91,6 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
 
     budget_df["Budget"] = budget_df["Budget"] + budget_df["point_bonus"].fillna(0)
     budget_df.drop(columns=["point_bonus"], inplace=True, errors="ignore")
-    budget_df.sort_values("Budget", ascending=False, inplace=True, ignore_index=True)
 
     # add total login bonus equally to everyone (100% estimation, if the user logged in every day)
     budget_df["Budget"] += total_login_bonus
@@ -119,6 +118,9 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
 
     # Calculate available budget
     budget_df["Available Budget"] = (budget_df["Max Negative"].fillna(0) - budget_df["Budget"]) * -1
+
+    # Sort by available budget ascending
+    budget_df.sort_values("Available Budget", ascending=False, inplace=True, ignore_index=True)
 
     return budget_df
 
