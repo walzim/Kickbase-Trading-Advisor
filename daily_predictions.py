@@ -24,6 +24,7 @@ load_dotenv()
 # TODO Add prediction of 3, 7 days, to give more context
 # TODO Based upon the overpay of the other users, calculate a max price to pay for a player
 # TODO Add features like starting 11 probability, injuries, ...
+# TODO Improve budget calculation, weird bug that for me the budgets is 513929 off, idk why, checked everything
 
 # ----------------- SYSTEM PARAMETERS -----------------
 # Should be left unchanged unless you know what you're doing
@@ -46,9 +47,9 @@ target = "mv_target_clipped"
 pd.options.display.float_format = lambda x: '{:,.0f}'.format(x).replace(',', '.')
 
 # Show all columns when displaying dataframes
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.width', 1000)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.width", 1000)
 
 # ----------------- USER SETTINGS -----------------
 # Adjust these settings to your preferences
@@ -62,8 +63,8 @@ email = os.getenv("EMAIL_USER")         # Email to send recommendations to, can 
 # ---------------------------------------------------
 
 # Load environment variables and login to kickbase
-USERNAME = os.getenv("KICK_USER")
-PASSWORD = os.getenv("KICK_PASS")
+USERNAME = os.getenv("KICK_USER") # DO NOT CHANGE THIS, YOU MUST SET THOSE IN GITHUB SECRETS OR A .env FILE
+PASSWORD = os.getenv("KICK_PASS") # DO NOT CHANGE THIS, YOU MUST SET THOSE IN GITHUB SECRETS OR A .env FILE
 token = login(USERNAME, PASSWORD)
 print("\nLogged in to Kickbase.")
 
