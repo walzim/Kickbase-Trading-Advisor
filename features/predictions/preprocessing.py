@@ -66,7 +66,6 @@ def preprocess_player_data(df):
         "won": -1
     })
 
-    # TODO: Move this into separate function
     # 7. Cutout todays values and store them
     now = datetime.now(ZoneInfo("Europe/Berlin"))
     cutoff_time = now.replace(hour=22, minute=15, second=0, microsecond=0)
