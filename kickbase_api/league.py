@@ -1,5 +1,4 @@
-from kickbase_api.config import BASE_URL
-import requests
+from kickbase_api.config import BASE_URL, get_json_with_token
 
 # All functions related to league data
 
@@ -30,10 +29,7 @@ def get_leagues_infos(token):
     """Get information about all leagues the user is part of."""
 
     url = f"{BASE_URL}/leagues/selection"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     result = []
 
@@ -50,10 +46,7 @@ def get_league_activities(token, league_id, league_start_date):
 
     # TODO magic number with 5000, have to find a better solution
     url = f"{BASE_URL}/leagues/{league_id}/activitiesFeed?max=5000"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     # Filter out entries prior to reset_Date
     filtered_activities = []
@@ -77,10 +70,7 @@ def get_league_players_on_market(token, league_id):
     """Get all players currently available on the market in the league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/market"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     result = []
 
@@ -92,3 +82,16 @@ def get_league_players_on_market(token, league_id):
         })
 
     return result
+
+def get_league_ranking(token, league_id):
+    """Get the overall league ranking."""
+    
+    url = f"{BASE_URL}/leagues/{league_id}/ranking"
+    data = get_json_with_token(url, token)
+
+    players = [(user["n"], user["sp"]) for user in data["us"]]
+
+    # Sort by score (descending)
+    ranked = sorted(players, key=lambda x: x[1], reverse=True)
+
+    return ranked

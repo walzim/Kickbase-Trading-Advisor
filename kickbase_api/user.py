@@ -1,4 +1,4 @@
-from kickbase_api.config import BASE_URL
+from kickbase_api.config import BASE_URL, get_json_with_token
 import requests
 
 # All functions related to the user itself
@@ -24,10 +24,7 @@ def get_username(token):
     """Gets the username of the logged-in user."""
 
     url = f"{BASE_URL}/user/settings"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     username = data["u"]["unm"]
 
@@ -37,10 +34,7 @@ def get_players_in_squad(token, league_id):
     """Gets the players in the user's squad for a given league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/squad"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     return data
 
@@ -48,10 +42,7 @@ def get_budget(token, league_id):
     """Gets the user's budget for a given league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/me/budget"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     data = data["b"]
 
@@ -61,9 +52,6 @@ def get_stats(token, league_id):
     """Gets the user's stats for a given league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/me"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     return data

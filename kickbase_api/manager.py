@@ -1,5 +1,4 @@
-from kickbase_api.config import BASE_URL
-import requests
+from kickbase_api.config import BASE_URL, get_json_with_token
 
 # All functions related to manager data
 
@@ -7,10 +6,7 @@ def get_managers(token, league_id):
     """Get a list of all managers in the league with their IDs and names."""
 
     url = f"{BASE_URL}/leagues/{league_id}/ranking"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     user_info = [(user["n"], user["i"]) for user in data["us"]]
 
@@ -20,10 +16,7 @@ def get_manager_info(token, league_id, manager_id):
     """Get detailed information about a specific manager in the league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/managers/{manager_id}/dashboard"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
 
     return data
 
@@ -31,10 +24,7 @@ def get_manager_performance(token, league_id, manager_id, manager_name):
     """Get performance data for a specific manager in the league."""
 
     url = f"{BASE_URL}/leagues/{league_id}/managers/{manager_id}/performance"
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
+    data = get_json_with_token(url, token)
     
     # Look for season ID "34" (current season 2025/2026)
     tp_value = 0
