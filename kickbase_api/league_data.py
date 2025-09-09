@@ -94,7 +94,7 @@ def get_activities(token, league_id, league_start_date):
 
     return trading, login, achievements
 
-# TODO achievements can be achieved multiple times, have to sum them up
+
 def get_achievement_reward(token, league_id, achievement_id):
     url = f"{BASE_URL}/leagues/{league_id}/user/achievements/{achievement_id}"
     headers = {"Authorization": f"Bearer {token}"}
@@ -102,9 +102,11 @@ def get_achievement_reward(token, league_id, achievement_id):
     resp.raise_for_status()
     data = resp.json()
 
-    data = data["er"]
+    amount = data["ac"]
+    reward = data["er"]
 
-    return data
+    return amount, reward
+
 
 def get_managers(token, league_id):
     url = f"{BASE_URL}/leagues/{league_id}/ranking"
@@ -140,3 +142,12 @@ def get_manager_performance(token, league_id, manager_id, manager_name):
         "name": manager_name,
         "tp": tp_value
     }
+
+def get_manager_info(token, league_id, manager_id):
+    url = f"{BASE_URL}/leagues/{league_id}/managers/{manager_id}/dashboard"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    return data

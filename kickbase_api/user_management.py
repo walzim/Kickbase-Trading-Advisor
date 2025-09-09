@@ -23,3 +23,34 @@ def get_players_in_squad(token, league_id):
     data = resp.json()
 
     return data
+
+def get_budget(token, league_id):
+    url = f"{BASE_URL}/leagues/{league_id}/me/budget"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    data = data["b"]
+
+    return data
+
+def get_stats(token, league_id):
+    url = f"{BASE_URL}/leagues/{league_id}/me"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    return data
+
+def get_username(token):
+    url = f"{BASE_URL}/user/settings"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    username = data["u"]["unm"]
+
+    return username
