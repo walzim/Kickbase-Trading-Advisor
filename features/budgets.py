@@ -57,12 +57,10 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
     perf_df = pd.DataFrame(performances)
     if not perf_df.empty:
         perf_df["point_bonus"] = perf_df["tp"].fillna(0) * 1000
-        perf_df["Max Negative"] = (perf_df["Team Value"].fillna(0) * 0.33) * -1
     else:
         perf_df["name"] = []
         perf_df["point_bonus"] = []
         perf_df["Team Value"] = []
-        perf_df["Max Negative"] = []
 
     # Initial budgets from activities
     budgets = {user: start_budget for user in set(activities_df["byr"].dropna().unique())
@@ -85,7 +83,7 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
 
     # Merge performance bonuses
     budget_df = budget_df.merge(
-        perf_df[["name", "point_bonus", "Team Value", "Max Negative"]],
+        perf_df[["name", "point_bonus", "Team Value"]],
         left_on="User",
         right_on="name",
         how="left"
@@ -115,6 +113,9 @@ def calc_manager_budgets(token, league_id, league_start_date, start_budget):
             budget_df.loc[mask, "Budget"] = own_budget
     except Exception as e:
         print(f"Warning: Could not sync own budget: {e}")
+
+    # TODO check if this also applies if the user has positiv budget, currently only tested with negative budget
+    budget_df["Max Negative"] = (budget_df["Team Value"].fillna(0) + budget_df["Budget"]) * -0.33
 
     # Calculate available budget
     budget_df["Available Budget"] = (budget_df["Max Negative"].fillna(0) - budget_df["Budget"]) * -1
