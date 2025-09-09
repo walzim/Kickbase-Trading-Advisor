@@ -1,4 +1,4 @@
-from kickbase_api.player_data import (
+from kickbase_api.player import (
     get_all_players,
     get_player_info,
     get_player_market_value,
