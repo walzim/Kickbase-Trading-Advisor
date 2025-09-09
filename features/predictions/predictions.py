@@ -36,7 +36,6 @@ def live_data_predictions(today_df, model, features):
     return today_df_results
 
 
-# TODO Some players are not listed here, since they are missing in today_df results (never played for the team before)
 def join_current_squad(token, league_id, today_df_results):
     squad_players = get_players_in_squad(token, league_id)
 
@@ -62,7 +61,7 @@ def join_current_squad(token, league_id, today_df_results):
     # Keep only relevant columns
     squad_df = squad_df[["last_name", "team_name", "mv", "mv_change_yesterday", "predicted_mv_target", "s_11_prob"]]
 
-    return squad_df  # Debugging line to inspect the response structure
+    return squad_df 
 
 
 # TODO Add fail-safe check before player expires if the prob (starting 11) is still high, so no injuries or anything. if it dropped. dont bid / reccommend
