@@ -1,7 +1,7 @@
-from kickbase_api.constants import BASE_URL
+from kickbase_api.config import BASE_URL
 import requests
 
-# All functions related to the user itself, like login, getting squad, budget, stats and username.
+# All functions related to the user itself
 
 def login(username, password):
     """Logs in to Kickbase and returns the authentication token."""

@@ -1,8 +1,12 @@
-from kickbase_api.constants import BASE_URL
+from kickbase_api.config import BASE_URL
 from datetime import datetime
 import requests
 
+# All other functions that don't fit anywhere else
+
 def get_all_teams(token, competition_id):
+    """Get all teams in a competition."""
+
     url = f"{BASE_URL}/competitions/{competition_id}/table"
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(url, headers=headers)
@@ -20,6 +24,8 @@ def get_all_teams(token, competition_id):
     return teams
 
 def get_matchdays(token, competition_id):
+    """Get all matchdays in a competition with the latest date for each matchday."""
+
     url = f"{BASE_URL}/competitions/{competition_id}/matchdays"
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(url, headers=headers)
@@ -45,3 +51,17 @@ def get_matchdays(token, competition_id):
     result = [{"day": day, "date": max_dates_per_day[day].isoformat()} for day in sorted(max_dates_per_day)]
 
     return result
+
+def get_achievement_reward(token, league_id, achievement_id):
+    """Get the reward and how often this was achieved by the user for a specific achievement in a league."""
+
+    url = f"{BASE_URL}/leagues/{league_id}/user/achievements/{achievement_id}"
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+
+    amount = data["ac"]
+    reward = data["er"]
+
+    return amount, reward

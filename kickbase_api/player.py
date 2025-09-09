@@ -1,9 +1,9 @@
-from kickbase_api.team_data import get_all_teams, get_matchdays
-from kickbase_api.constants import BASE_URL
+from kickbase_api.others import get_all_teams, get_matchdays
+from kickbase_api.config import BASE_URL
 from datetime import datetime, timedelta
 import requests
 
-# All functions related to player data, like market value, performance, player info and searching for players.
+# All functions related to player data
 
 def get_player_id(token, competition_id, name):
     """Search for a player by name and return their player ID."""
