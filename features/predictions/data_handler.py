@@ -44,6 +44,9 @@ def create_player_data_table():
 def check_if_data_reload_needed():
     """Check if data reload is needed based on the last entry with null market value"""
 
+    print("\nData reload needed, this takes a few minutes...")
+    return True # Due to some issues with the data, we always reload for now, until fixed
+
     now = datetime.now(ZoneInfo("Europe/Berlin"))
     today_date = now.date()
 
@@ -117,10 +120,11 @@ def save_player_data_to_db(token, competition_ids, last_mv_values, last_pfm_valu
                     mv_df["date"] = pd.to_datetime(mv_df["date"]).sort_values()
 
                 # Special case for players with 500k market value and no change, manually add them
-                if mv_df["date"].max() < pd.Timestamp(datetime.now(ZoneInfo("Europe/Berlin")).date()):
-                    last_row = mv_df.iloc[-1].copy()
-                    last_row["date"] = pd.Timestamp(datetime.now(ZoneInfo("Europe/Berlin")).date())
-                    mv_df = pd.concat([mv_df, pd.DataFrame([last_row])], ignore_index=True)
+                #if (mv_df["date"].max() < pd.Timestamp(datetime.now(ZoneInfo("Europe/Berlin")).date())) and mv_df["mv"].iloc[-1] == 500_000:
+                #    print("Testing special case")
+                #    last_row = mv_df.iloc[-1].copy()
+                #    last_row["date"] = pd.Timestamp(datetime.now(ZoneInfo("Europe/Berlin")).date())
+                #    mv_df = pd.concat([mv_df, pd.DataFrame([last_row])], ignore_index=True)
 
                 # Performance
                 p_df = pd.DataFrame(get_player_performance(token, competition_id, player_id, last_pfm_values, player_team_id))
