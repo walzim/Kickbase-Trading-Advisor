@@ -38,6 +38,9 @@ def join_current_squad(token, league_id, today_df_results):
 
     squad_df = pd.DataFrame(squad_players["it"])
 
+    # Sort by merge key before merging to avoid "right keys must be sorted" error
+    squad_df = squad_df.sort_values("i")
+
     # Join squad_df ("i") with today_df ("player_id")
     squad_df = (
         pd.merge(today_df_results, squad_df, left_on="player_id", right_on="i")
@@ -69,6 +72,9 @@ def join_current_market(token, league_id, today_df_results):
 
     # players_on_market to DataFrame
     market_df = pd.DataFrame(players_on_market)
+
+    # Sort by merge key before merging to avoid "right keys must be sorted" error
+    market_df = market_df.sort_values("id")
 
     # Join market_df ("id") with today_df ("player_id")
     bid_df = (
